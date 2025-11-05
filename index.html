@@ -7,216 +7,152 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --a1:#5e60ce; /* indigo */
-    --a2:#64dfdf; /* teal */
-    --a3:#72efdd; /* mint */
-    --glass: rgba(255,255,255,.1);
-    --shadow: rgba(0,0,0,.22);
+    --a1:#5e60ce; --a2:#64dfdf; --a3:#72efdd;
+    --shadow:rgba(0,0,0,0.25);
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;}
   body{
-    margin:0; color:#fff; font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    min-height:100svh; display:flex; flex-direction:column; align-items:center; overflow-x:hidden;
-    background: radial-gradient(1200px 800px at 20% 10%, #64dfdf33, transparent 60%),
-                radial-gradient(1000px 800px at 80% 0%,  #72efdd33, transparent 65%),
-                radial-gradient(1000px 900px at 50% 80%, #5e60ce33, transparent 70%),
-                linear-gradient(120deg, var(--a1), var(--a2) 50%, var(--a3));
-    background-attachment: fixed;
+    margin:0; color:#fff; font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,var(--a1),var(--a2),var(--a3));
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    overflow-x:hidden;
   }
 
-  /* ====== LAYER: Aurora animasi ====== */
-  .aurora {
-    position: fixed; inset: -30% -30% -30% -30%;
-    pointer-events:none; z-index:-2;
+  .aurora{
+    position:fixed; inset:-30%; z-index:-2; pointer-events:none;
     background:
-      /* gelombang 1 (conic) */
-      conic-gradient(from 0deg at 30% 20%, #64dfdf55, transparent 60%),
-      /* gelombang 2 (conic) */
-      conic-gradient(from 180deg at 70% 10%, #72efdd55, transparent 60%),
-      /* gelombang 3 (radial) */
-      radial-gradient(40% 35% at 50% 85%, #5e60ce55, transparent 60%);
-    filter: blur(32px) saturate(120%);
-    animation: waveX 18s ease-in-out infinite alternate,
-               waveY 22s ease-in-out infinite alternate-reverse,
-               breathe 7s ease-in-out infinite;
+      conic-gradient(from 90deg at 30% 10%, #64dfdf44, transparent 60%),
+      conic-gradient(from 180deg at 70% 0%, #72efdd44, transparent 60%),
+      radial-gradient(40% 40% at 50% 90%, #5e60ce55, transparent 60%);
+    filter:blur(40px);
+    animation:wave 20s ease-in-out infinite alternate;
   }
-  @keyframes waveX{
-    0%{transform:translateX(-4%) rotate(0.5deg) scale(1.02)}
-    100%{transform:translateX(6%) rotate(-0.5deg) scale(1.08)}
+  @keyframes wave {
+    0%{transform:translateX(-5%) scale(1);}
+    100%{transform:translateX(5%) scale(1.1);}
   }
-  @keyframes waveY{
-    0%{transform:translateY(-3%)}
-    100%{transform:translateY(5%)}
-  }
-  @keyframes breathe{
-    0%,100%{opacity:.55}
-    50%{opacity:.9}
-  }
-
-  /* ====== LAYER: Logo GKE sebagai background ====== */
   .logo-bg{
-    position: fixed; inset:0; z-index:-1; pointer-events:none;
-    background:
-      url('https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png')
+    position:fixed; inset:0; z-index:-1; opacity:.15;
+    background:url('https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png')
       center/contain no-repeat;
-    mix-blend-mode: soft-light;       /* menyatu ke aurora */
-    opacity:.18;                       /* cukup terlihat tapi halus */
-    filter: drop-shadow(0 0 24px rgba(255,255,255,.25));
+    mix-blend-mode:soft-light;
   }
 
-  header{ text-align:center; margin-top:2rem }
-  header .badge-logo{
-    width:92px; height:92px; border-radius:50%;
-    background: rgba(255,255,255,.15);
-    display:inline-grid; place-items:center;
-    outline:1px solid rgba(255,255,255,.35);
-    box-shadow:0 8px 20px var(--shadow);
-    backdrop-filter: blur(6px);
-  }
-  header .badge-logo img{ width:66px; height:auto; opacity:.95 }
-  h1{ margin:.75rem 0 0; font-size:1.7rem; font-weight:600 }
-  header p{ margin:.2rem 0 1rem; color:#e4fbff }
+  header{text-align:center;margin-top:2rem;}
+  header img{width:85px;border-radius:50%;box-shadow:0 0 10px #ffffff33;}
+  h1{margin:.6rem 0 0;font-size:1.7rem;font-weight:600;}
+  header p{margin:.2rem 0 1.5rem;color:#e2ffff;}
 
-  /* Kartu form (glassmorphism) */
   form{
-    background: var(--glass);
-    backdrop-filter: blur(12px);
-    border-radius:20px; padding:2rem;
-    width:min(92%, 780px);
-    box-shadow: 0 8px 24px var(--shadow);
-    margin: 1.25rem auto 3rem;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(12px);
+    border-radius:20px;
+    box-shadow:0 8px 25px var(--shadow);
+    width:90%; max-width:780px; padding:2rem; margin-bottom:3rem;
   }
-  label{ display:flex; flex-direction:column; gap:.35rem; margin-bottom:1rem; font-weight:500 }
+  label{display:flex;flex-direction:column;margin-bottom:1rem;font-weight:500;}
   input,select{
-    padding:.7rem .9rem; border:none; border-radius:10px;
-    background:#fffffff2; color:#2b2b2b; font-size:1rem; outline:none;
+    margin-top:.4rem;padding:.7rem;border:none;border-radius:10px;
+    font-size:1rem;background:rgba(255,255,255,0.95);color:#333;
   }
-  input:focus,select:focus{ box-shadow:0 0 0 3px #64dfdf69 }
-  fieldset{ border:none; margin-top:.6rem }
-  legend{ font-weight:600; margin-bottom:.4rem }
-  .grid{
-    display:grid; gap:.7rem;
-    grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
-  }
-  .actions{ display:flex; justify-content:center; gap:1rem; margin-top:1.2rem }
+  fieldset{border:none;margin-top:1rem;}
+  legend{font-weight:600;margin-bottom:.5rem;}
+  .grid{display:grid;gap:.7rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));}
+  .actions{display:flex;justify-content:center;gap:1rem;margin-top:1.5rem;}
   button{
-    border:none; padding:.9rem 1.6rem; border-radius:12px; cursor:pointer; color:#fff;
-    font-weight:700; letter-spacing:.2px;
-    background: linear-gradient(90deg, var(--a1), var(--a2));
-    transition: transform .25s ease, filter .25s ease, background .25s ease;
+    border:none;padding:.9rem 1.6rem;border-radius:12px;
+    cursor:pointer;font-weight:600;color:#fff;
+    background:linear-gradient(90deg,var(--a1),var(--a2));
+    transition:.3s;
   }
-  button:hover{ transform: translateY(-1px) scale(1.03);
-    background: linear-gradient(90deg, var(--a2), var(--a3)); filter:brightness(1.05) }
-  button.secondary{ background: rgba(255,255,255,.28) }
-
-  footer{ margin-top:auto; padding:1rem; text-align:center; color:#f0faff; opacity:.9 }
-
-  @media (max-width:600px){
-    form{ padding:1.25rem }
-    h1{ font-size:1.35rem }
-  }
-
-  /* Aksesibilitas: hormati preferensi reduksi animasi */
-  @media (prefers-reduced-motion: reduce){
-    .aurora{ animation: none }
-  }
+  button:hover{transform:scale(1.05);background:linear-gradient(90deg,var(--a2),var(--a3));}
+  button.secondary{background:rgba(255,255,255,0.25);}
+  footer{text-align:center;margin-top:auto;padding:1rem;color:#f0faff;opacity:.9;}
+  @media(max-width:600px){form{padding:1.2rem;}h1{font-size:1.4rem;}}
 </style>
 </head>
 <body>
-  <!-- Lapis animasi & logo background -->
-  <div class="aurora"></div>
-  <div class="logo-bg" aria-hidden="true"></div>
+<div class="aurora"></div>
+<div class="logo-bg"></div>
 
-  <header>
-    <div class="badge-logo">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png" alt="Logo GKE">
-    </div>
-    <h1>Usulan Pra Pertemuan Pekerja</h1>
-    <p>Gereja Kalimantan Evangelis</p>
-  </header>
+<header>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png" alt="Logo GKE">
+  <h1>Usulan Pra Pertemuan Pekerja</h1>
+  <p>Gereja Kalimantan Evangelis</p>
+</header>
 
-  <form id="usulanForm" autocomplete="on">
-    <label>Tanggal
-      <input type="date" name="tanggal" required>
-    </label>
+<form id="usulanForm">
+  <label>Tanggal
+    <input type="date" name="tanggal" required>
+  </label>
 
-    <label>Kelompok Pekerja
-      <select name="kelompok" required>
-        <option value="">-- Pilih Kelompok --</option>
-        <option>Pendeta/Vicaris</option>
-        <option>BPP</option>
-        <option>Pengurus Lingkungan Sion</option>
-        <option>Pengurus Lingkungan Betlehem</option>
-        <option>Pengurus Lingkungan Betania</option>
-        <option>Pengurus Lingkungan Siloam</option>
-        <option>Seksi Pelayanan Anak</option>
-        <option>Seksi Pelayanan Remaja dan Pemuda</option>
-        <option>Seksi Pelayanan Perempuan</option>
-        <option>Seksi Pelayanan Bapak</option>
-        <option>Seksi Pelayanan Lansia</option>
-        <option>Operator LCD</option>
-        <option>Organis/Pemain Musik</option>
-        <option>Song Leaders</option>
-        <option>Tim Musik</option>
-        <option>Tim Multimedia</option>
-        <option>Koster Gereja Efata</option>
-        <option>Koster Gereja Maranatha</option>
-        <option>Panitia Pembangunan dan Pemeliharaan Gereja Efata</option>
-        <option>Panitia Pembangunan dan Pemeliharaan Gereja Maranatha</option>
-        <option>Panitia Pengadaan dan Pemeliharaan Tanah Pemakaman</option>
-      </select>
-    </label>
+  <label>Kelompok Pekerja
+    <select name="kelompok" required>
+      <option value="">-- Pilih Kelompok --</option>
+      <option>Pendeta/Vicaris</option>
+      <option>BPP</option>
+      <option>Pengurus Lingkungan Sion</option>
+      <option>Pengurus Lingkungan Betlehem</option>
+      <option>Pengurus Lingkungan Betania</option>
+      <option>Pengurus Lingkungan Siloam</option>
+      <option>Seksi Pelayanan Anak</option>
+      <option>Seksi Pelayanan Remaja dan Pemuda</option>
+      <option>Seksi Pelayanan Perempuan</option>
+      <option>Seksi Pelayanan Bapak</option>
+      <option>Seksi Pelayanan Lansia</option>
+      <option>Operator LCD</option>
+      <option>Organis/Pemain Musik</option>
+      <option>Song Leaders</option>
+      <option>Tim Musik</option>
+      <option>Tim Multimedia</option>
+      <option>Koster Gereja Efata</option>
+      <option>Koster Gereja Maranatha</option>
+      <option>Panitia Pembangunan dan Pemeliharaan Gereja Efata</option>
+      <option>Panitia Pembangunan dan Pemeliharaan Gereja Maranatha</option>
+      <option>Panitia Pengadaan dan Pemeliharaan Tanah Pemakaman</option>
+    </select>
+  </label>
 
-    <label>Nama Pengisi
-      <input type="text" name="nama" placeholder="Nama lengkap" required>
-    </label>
+  <label>Nama Pengisi
+    <input type="text" name="nama" placeholder="Nama lengkap" required>
+  </label>
 
-    <fieldset>
-      <legend>Usulan / Pendapat / Masukan</legend>
-      <div class="grid" id="gridUsulan"></div>
-    </fieldset>
+  <fieldset>
+    <legend>Usulan / Pendapat / Masukan</legend>
+    <div class="grid" id="gridUsulan"></div>
+  </fieldset>
 
-    <div class="actions">
-      <button type="submit">Kirim Usulan</button>
-      <button type="reset" class="secondary">Reset</button>
-    </div>
-  </form>
+  <div class="actions">
+    <button type="submit">Kirim Usulan</button>
+    <button type="reset" class="secondary">Reset</button>
+  </div>
+</form>
 
-  <footer>
-    &copy; <span id="year"></span> Gereja Kalimantan Evangelis
-  </footer>
+<footer>&copy; <span id="year"></span> Gereja Kalimantan Evangelis</footer>
 
 <script>
-  // Buat 10 input usulan
+  // generate 10 input usulan otomatis
   const grid = document.getElementById('gridUsulan');
   for(let i=1;i<=10;i++){
-    const wrap = document.createElement('label');
-    wrap.innerHTML = `Usulan ${i}<input type="text" name="usulan${i}" />`;
-    grid.appendChild(wrap);
+    const lbl=document.createElement('label');
+    lbl.innerHTML=`Usulan ${i}<input type='text' name='usulan${i}' />`;
+    grid.appendChild(lbl);
   }
-  document.getElementById('year').textContent = new Date().getFullYear();
+  document.getElementById('year').textContent=new Date().getFullYear();
 
-  // URL Apps Script (punya bro) -> doPost
-  const SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
+  // URL Apps Script kamu
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
 
-  // Kirim data ke Apps Script
-  const form = document.getElementById('usulanForm');
-  form.addEventListener('submit', async (e)=>{
+  document.getElementById('usulanForm').addEventListener('submit', async e=>{
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(form).entries());
-
+    const data=Object.fromEntries(new FormData(e.target).entries());
     try{
-      await fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',            // sesuai endpoint Apps Script publik
-        body: JSON.stringify(data)  // backend membaca JSON ini
-      });
+      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(data)});
       alert('✅ Usulan berhasil dikirim. Terima kasih!');
-      form.reset();
+      e.target.reset();
     }catch(err){
+      alert('❌ Gagal mengirim, periksa koneksi.');
       console.error(err);
-      alert('❌ Gagal mengirim. Coba lagi.');
     }
   });
 </script>
