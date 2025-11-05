@@ -225,45 +225,63 @@
   });
 </script>
   <script>
-  // === REKAP DARI GOOGLE SHEET ===
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHCQ_5BGfWSTnGY3Si0DOMP9MIrmhtJT7I8N0pvuR3T8IZ_sL9kCwiV0qAbJZRf2EGiIr33W9QVMsT/gviz/tq?tqx=out:json&sheet=usulan";
+const SHEET_JSON_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHCQ_5BGfWSTnGY3Si0DOMP9MIrmhtJT7I8N0pvuR3T8IZ_sL9kCwiV0qAbJZRf2EGiIr33W9QVMsT/gviz/tq?tqx=out:json&sheet=usulan";
 
-  async function loadData(){
-    try {
-      const res = await fetch(SHEET_URL);
-      const text = await res.text();
-      const json = JSON.parse(text.substr(47).slice(0, -2)); // potong format khas gviz
-      const table = document.getElementById("rekapBody");
-      table.innerHTML = "";
+const tableBody = document.getElementById("rekapBody");
+const statusMsg = document.getElementById("statusMsg");
+const reloadBtn = document.getElementById("reloadBtn");
 
-      json.table.rows.forEach(row => {
-        const cells = row.c.map(c => c ? c.v : "");
-        if (cells.length >= 14) {
-          const id = cells[0];
-          const tanggal = cells[1];
-          const kelompok = cells[2];
-          const nama = cells[3];
-          const usulan = cells.slice(4,14);
-          const jml = usulan.filter(x => x && x.trim() !== "").length;
+// fungsi muat data
+async function loadData() {
+  tableBody.style.opacity = 0.3;
+  statusMsg.textContent = "⏳ Memuat data...";
+  try {
+    const res = await fetch(SHEET_JSON_URL + "&t=" + new Date().getTime()); // biar gak cache
+    const text = await res.text();
+    // hilangkan pembungkus JSON khas Google
+    const json = JSON.parse(text.substring(47).replace(/\);$/, ""));
+    const rows = json.table.rows;
 
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${id}</td>
-            <td>${tanggal}</td>
-            <td>${kelompok}</td>
-            <td>${nama}</td>
-            <td style="text-align:center">${jml}</td>
-          `;
-          table.appendChild(tr);
-        }
-      });
-    } catch(err){
-      console.error(err);
-    }
+    tableBody.innerHTML = "";
+
+    rows.forEach((r, i) => {
+      // ambil setiap sel
+      const c = r.c.map(x => (x ? x.v : ""));
+      // kalau baris kosong, skip
+      if (!c[0]) return;
+
+      const id = c[0];
+      const tanggal = c[1];
+      const kelompok = c[2];
+      const nama = c[3];
+      const usulans = c.slice(4, 14); // kolom Usulan 1–10
+      const jumlahUsulan = usulans.filter(x => x && x.trim() !== "").length;
+
+      // bikin baris tabel
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${id}</td>
+        <td>${tanggal}</td>
+        <td>${kelompok}</td>
+        <td>${nama}</td>
+        <td style="text-align:center">${jumlahUsulan}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+    tableBody.style.opacity = 1;
+    statusMsg.textContent = "✅ Data berhasil dimuat dari Google Sheet";
+  } catch (err) {
+    console.error("Gagal memuat data:", err);
+    statusMsg.textContent = "⚠️ Gagal memuat data, coba lagi.";
   }
+}
 
-  loadData();
+reloadBtn.addEventListener("click", loadData);
+loadData();
 </script>
+
 
 </body>
 </html>
