@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Usulan Pra Pertemuan Pekerja Gereja ke-4 Tahun 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-  :root {
-    --shadow: rgba(0,0,0,0.25);
-  }
+  :root { --shadow: rgba(0,0,0,0.25); }
   * { box-sizing: border-box; }
+
   body {
     margin: 0;
     color: #fff;
@@ -22,7 +22,7 @@
     background: #000;
   }
 
-  /* === AURORA RAINBOW LIGHT & DYNAMIC === */
+  /* === AURORA RAINBOW DYNAMIC === */
   .aurora {
     position: fixed;
     inset: -40%;
@@ -38,27 +38,27 @@
       #8a2be2,
       #ff00ff,
       #ff0000);
-    background-size: 600% 600%;
-    opacity: 0.6;
-    filter: blur(100px);
-    animation: moveAurora 25s ease-in-out infinite alternate, hueSpin 60s linear infinite;
+    background-size: 800% 800%;
+    opacity: 0.55;
+    filter: blur(110px) contrast(120%);
+    animation: moveAurora 25s ease-in-out infinite alternate, hueSpin 40s linear infinite;
   }
+
   @keyframes moveAurora {
-    0% { transform: translate(-8%, -5%) scale(1.05); background-position: 0% 50%; }
-    50% { transform: translate(8%, 5%) scale(1.1); background-position: 100% 50%; }
-    100% { transform: translate(-8%, -10%) scale(1.05); background-position: 0% 50%; }
+    0% { transform: translate(-10%, -8%) scale(1.05); background-position: 0% 50%; }
+    50% { transform: translate(8%, 6%) scale(1.08); background-position: 100% 50%; }
+    100% { transform: translate(-6%, 8%) scale(1.04); background-position: 0% 50%; }
   }
   @keyframes hueSpin {
-    from { filter: hue-rotate(0deg) blur(100px); }
-    to { filter: hue-rotate(360deg) blur(100px); }
+    from { filter: hue-rotate(0deg) blur(110px) contrast(120%); }
+    to { filter: hue-rotate(360deg) blur(110px) contrast(120%); }
   }
 
   /* === LOGO BACKGROUND === */
   .logo-bg {
     position: fixed;
     inset: 0;
-    background: url('https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png')
-      center/contain no-repeat;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png') center/contain no-repeat;
     mix-blend-mode: soft-light;
     opacity: 0.15;
     z-index: -2;
@@ -104,6 +104,25 @@
   }
   button:hover { transform: scale(1.05); }
   footer { text-align: center; margin-top: auto; padding: 1rem; color: #f0faff; opacity: .9; }
+
+  /* === TABEL REKAP === */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  th {
+    background: rgba(255,255,255,0.25);
+    text-align: left;
+  }
+  tr:nth-child(even) { background: rgba(255,255,255,0.06); }
+  tr:nth-child(odd) { background: rgba(255,255,255,0.12); }
+
 </style>
 </head>
 
@@ -169,18 +188,17 @@
     📊 <span>Rekap Usulan yang Masuk</span>
   </h2>
   <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;color:#fff;font-size:0.95rem;">
+    <table>
       <thead>
-        <tr style="background:rgba(255,255,255,0.25);box-shadow:inset 0 -2px 0 rgba(255,255,255,0.3);">
-          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:left;">ID</th>
-          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:left;">Tanggal</th>
-          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:left;">Kelompok Pekerja</th>
-          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:left;">Nama Pengisi</th>
-          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:center;">Jumlah Usulan</th>
+        <tr>
+          <th>ID</th>
+          <th>Tanggal</th>
+          <th>Kelompok Pekerja</th>
+          <th>Nama Pengisi</th>
+          <th style="text-align:center;">Jumlah Usulan</th>
         </tr>
       </thead>
-      <tbody id="rekapBody"
-        style="transition:opacity .4s ease;border-radius:12px;overflow:hidden;"></tbody>
+      <tbody id="rekapBody"></tbody>
     </table>
   </div>
   <p id="statusMsg" style="text-align:center;margin-top:1rem;font-size:.85rem;opacity:.9;">
@@ -188,22 +206,49 @@
   </p>
 </section>
 
+<footer>&copy; <span id="year"></span> MPHJ GKE Yerusalem Tamiang Layang</footer>
+
 <script>
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHCQ_5BGfWSTnGY3Si0DOMP9MIrmhtJT7I8N0pvuR3T8IZ_sL9kCwiV0qAbJZRf2EGiIr33W9QVMsT/pub?gid=0&single=true&output=csv";
 const tableBody = document.getElementById("rekapBody");
 const statusMsg = document.getElementById("statusMsg");
+document.getElementById('year').textContent = new Date().getFullYear();
 
-// Fungsi ubah format tanggal ke Bahasa Indonesia
+// Generate 10 kolom usulan otomatis
+const grid = document.getElementById('gridUsulan');
+for (let i = 1; i <= 10; i++) {
+  const lbl = document.createElement('label');
+  lbl.innerHTML = `Usulan ${i}<input type='text' name='usulan${i}' />`;
+  grid.appendChild(lbl);
+}
+
+// Fungsi ubah format tanggal ke format Indonesia
 function formatTanggal(tgl) {
   if (!tgl || !/^\d{4}-\d{2}-\d{2}$/.test(tgl)) return tgl;
   const [y, m, d] = tgl.split("-");
   const bulan = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
   ];
   return `${d} ${bulan[parseInt(m)-1]} ${y}`;
 }
 
+// Kirim data ke Apps Script
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
+document.getElementById('usulanForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target).entries());
+  try {
+    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+    alert('✅ Usulan berhasil dikirim. Terima kasih!');
+    e.target.reset();
+  } catch (err) {
+    alert('❌ Gagal mengirim, periksa koneksi.');
+    console.error(err);
+  }
+});
+
+// Load data dari Google Sheet
 async function loadData() {
   try {
     tableBody.innerHTML = "";
@@ -219,23 +264,19 @@ async function loadData() {
     rows.slice(1).forEach((cols, i) => {
       if (cols.length < 14) return;
       const id = cols[0] || i + 1;
-      const tanggal = formatTanggal(cols[1] || "-");
+      const tanggal = formatTanggal(cols[1]);
       const kelompok = cols[2] || "-";
       const nama = cols[3] || "-";
       const usulans = cols.slice(4, 14);
       const jumlah = usulans.filter(x => x && x.trim() !== "").length;
 
       const tr = document.createElement("tr");
-      tr.style.background = i % 2 === 0
-        ? "rgba(255,255,255,0.06)"
-        : "rgba(255,255,255,0.12)";
-      tr.style.borderBottom = "1px solid rgba(255,255,255,0.15)";
       tr.innerHTML = `
-        <td style="padding:8px 6px;">${id}</td>
-        <td style="padding:8px 6px;">${tanggal}</td>
-        <td style="padding:8px 6px;">${kelompok}</td>
-        <td style="padding:8px 6px;">${nama}</td>
-        <td style="padding:8px 6px;text-align:center;">${jumlah}</td>`;
+        <td>${id}</td>
+        <td>${tanggal}</td>
+        <td>${kelompok}</td>
+        <td>${nama}</td>
+        <td style="text-align:center;">${jumlah}</td>`;
       tableBody.appendChild(tr);
     });
 
@@ -245,7 +286,6 @@ async function loadData() {
     statusMsg.textContent = "⚠️ Gagal memuat data, periksa koneksi atau izin Sheet.";
   }
 }
-
 loadData();
 </script>
 </body>
