@@ -1,41 +1,50 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Usulan Pra Pertemuan Pekerja GKE</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --a1:#5e60ce; --a2:#64dfdf; --a3:#72efdd;
-    --shadow:rgba(0,0,0,0.25);
+    --shadow: rgba(0,0,0,0.25);
   }
   *{box-sizing:border-box;}
   body{
     margin:0; color:#fff; font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,var(--a1),var(--a2),var(--a3));
     min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    background:#000;
     overflow-x:hidden;
   }
 
-  .aurora{
-    position:fixed; inset:-30%; z-index:-2; pointer-events:none;
-    background:
-      conic-gradient(from 90deg at 30% 10%, #64dfdf44, transparent 60%),
-      conic-gradient(from 180deg at 70% 0%, #72efdd44, transparent 60%),
-      radial-gradient(40% 40% at 50% 90%, #5e60ce55, transparent 60%);
-    filter:blur(40px);
-    animation:wave 20s ease-in-out infinite alternate;
+  /* === AURORA DYNAMIC MULTICOLOR === */
+  .aurora {
+    position: fixed;
+    inset: -40% -40% -40% -40%;
+    pointer-events: none;
+    z-index: -2;
+    background: 
+      conic-gradient(from 0deg, red, orange, yellow, green, cyan, blue, violet, red);
+    mix-blend-mode: screen;
+    opacity: 0.6;
+    filter: blur(140px) saturate(150%);
+    animation: auroraMove 25s linear infinite, hueSpin 20s linear infinite;
   }
-  @keyframes wave {
-    0%{transform:translateX(-5%) scale(1);}
-    100%{transform:translateX(5%) scale(1.1);}
+
+  @keyframes auroraMove {
+    0% { transform: translate(-10%, -10%) scale(1); }
+    25%{ transform: translate(10%, -5%) scale(1.1);}
+    50%{ transform: translate(5%, 10%) scale(1.05);}
+    75%{ transform: translate(-5%, 5%) scale(1.1);}
+    100%{ transform: translate(-10%, -10%) scale(1);}
   }
-  .logo-bg{
-    position:fixed; inset:0; z-index:-1; opacity:.15;
-    background:url('https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png')
-      center/contain no-repeat;
-    mix-blend-mode:soft-light;
+
+  @keyframes hueSpin {
+    from { filter: hue-rotate(0deg) blur(140px) saturate(150%); }
+    to { filter: hue-rotate(360deg) blur(140px) saturate(150%); }
+  }
+
+  /* Logo background */
+  .logo-bg {
+    position: fixed;
+    inset: 0;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png') center/contain no-repeat;
+    mix-blend-mode: soft-light;
+    opacity: 0.15;
+    z-index: -1;
   }
 
   header{text-align:center;margin-top:2rem;}
@@ -62,99 +71,15 @@
   button{
     border:none;padding:.9rem 1.6rem;border-radius:12px;
     cursor:pointer;font-weight:600;color:#fff;
-    background:linear-gradient(90deg,var(--a1),var(--a2));
-    transition:.3s;
+    background:linear-gradient(90deg,#ff007f,#7f00ff,#00ffff);
+    background-size:300% 300%;
+    animation:btnFlow 8s linear infinite;
   }
-  button:hover{transform:scale(1.05);background:linear-gradient(90deg,var(--a2),var(--a3));}
-  button.secondary{background:rgba(255,255,255,0.25);}
+  @keyframes btnFlow {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  button:hover{transform:scale(1.05);}
   footer{text-align:center;margin-top:auto;padding:1rem;color:#f0faff;opacity:.9;}
-  @media(max-width:600px){form{padding:1.2rem;}h1{font-size:1.4rem;}}
 </style>
-</head>
-<body>
-<div class="aurora"></div>
-<div class="logo-bg"></div>
-
-<header>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png" alt="Logo GKE">
-  <h1>Usulan Pra Pertemuan Pekerja</h1>
-  <p>Gereja Kalimantan Evangelis</p>
-</header>
-
-<form id="usulanForm">
-  <label>Tanggal
-    <input type="date" name="tanggal" required>
-  </label>
-
-  <label>Kelompok Pekerja
-    <select name="kelompok" required>
-      <option value="">-- Pilih Kelompok --</option>
-      <option>Pendeta/Vicaris</option>
-      <option>BPP</option>
-      <option>Pengurus Lingkungan Sion</option>
-      <option>Pengurus Lingkungan Betlehem</option>
-      <option>Pengurus Lingkungan Betania</option>
-      <option>Pengurus Lingkungan Siloam</option>
-      <option>Seksi Pelayanan Anak</option>
-      <option>Seksi Pelayanan Remaja dan Pemuda</option>
-      <option>Seksi Pelayanan Perempuan</option>
-      <option>Seksi Pelayanan Bapak</option>
-      <option>Seksi Pelayanan Lansia</option>
-      <option>Operator LCD</option>
-      <option>Organis/Pemain Musik</option>
-      <option>Song Leaders</option>
-      <option>Tim Musik</option>
-      <option>Tim Multimedia</option>
-      <option>Koster Gereja Efata</option>
-      <option>Koster Gereja Maranatha</option>
-      <option>Panitia Pembangunan dan Pemeliharaan Gereja Efata</option>
-      <option>Panitia Pembangunan dan Pemeliharaan Gereja Maranatha</option>
-      <option>Panitia Pengadaan dan Pemeliharaan Tanah Pemakaman</option>
-    </select>
-  </label>
-
-  <label>Nama Pengisi
-    <input type="text" name="nama" placeholder="Nama lengkap" required>
-  </label>
-
-  <fieldset>
-    <legend>Usulan / Pendapat / Masukan</legend>
-    <div class="grid" id="gridUsulan"></div>
-  </fieldset>
-
-  <div class="actions">
-    <button type="submit">Kirim Usulan</button>
-    <button type="reset" class="secondary">Reset</button>
-  </div>
-</form>
-
-<footer>&copy; <span id="year"></span> Gereja Kalimantan Evangelis</footer>
-
-<script>
-  // generate 10 input usulan otomatis
-  const grid = document.getElementById('gridUsulan');
-  for(let i=1;i<=10;i++){
-    const lbl=document.createElement('label');
-    lbl.innerHTML=`Usulan ${i}<input type='text' name='usulan${i}' />`;
-    grid.appendChild(lbl);
-  }
-  document.getElementById('year').textContent=new Date().getFullYear();
-
-  // URL Apps Script kamu
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
-
-  document.getElementById('usulanForm').addEventListener('submit', async e=>{
-    e.preventDefault();
-    const data=Object.fromEntries(new FormData(e.target).entries());
-    try{
-      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(data)});
-      alert('✅ Usulan berhasil dikirim. Terima kasih!');
-      e.target.reset();
-    }catch(err){
-      alert('❌ Gagal mengirim, periksa koneksi.');
-      console.error(err);
-    }
-  });
-</script>
-</body>
-</html>
