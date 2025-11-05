@@ -13,52 +13,78 @@
   body{
     margin:0; color:#fff; font-family:'Poppins',sans-serif;
     min-height:100vh; display:flex; flex-direction:column; align-items:center;
-    background:#000;
     overflow-x:hidden;
+    background:#000;
   }
 
-  /* === AURORA DYNAMIC MULTICOLOR === */
-  .aurora {
-    position: fixed;
-    inset: -40% -40% -40% -40%;
-    pointer-events: none;
-    z-index: -2;
-    background: 
-      conic-gradient(from 0deg, red, orange, yellow, green, cyan, blue, violet, red);
-    mix-blend-mode: screen;
-    opacity: 0.6;
-    filter: blur(140px) saturate(150%);
-    animation: auroraMove 25s linear infinite, hueSpin 20s linear infinite;
+  /* === AURORA MULTI-LAYER DYNAMIC === */
+  .aurora, .aurora::before, .aurora::after {
+    content:"";
+    position:fixed;
+    inset:-50%;
+    z-index:-3;
+    pointer-events:none;
+    background:linear-gradient(270deg,
+      #ff0000,
+      #ffa500,
+      #ffff00,
+      #00ff00,
+      #00ffff,
+      #0000ff,
+      #8a2be2,
+      #ff00ff,
+      #ff0000);
+    background-size:800% 800%;
+    mix-blend-mode:screen;
+    filter:blur(140px);
+    opacity:0.5;
+    animation:flow1 40s ease-in-out infinite alternate, hue 60s linear infinite;
+  }
+  .aurora::before {
+    animation:flow2 55s ease-in-out infinite alternate, hue 70s linear infinite reverse;
+    opacity:.35;
+  }
+  .aurora::after {
+    animation:flow3 70s ease-in-out infinite alternate, hue 80s linear infinite;
+    opacity:.3;
   }
 
-  @keyframes auroraMove {
-    0% { transform: translate(-10%, -10%) scale(1); }
-    25%{ transform: translate(10%, -5%) scale(1.1);}
-    50%{ transform: translate(5%, 10%) scale(1.05);}
-    75%{ transform: translate(-5%, 5%) scale(1.1);}
-    100%{ transform: translate(-10%, -10%) scale(1);}
+  @keyframes hue {
+    from { filter:hue-rotate(0deg) blur(140px); }
+    to { filter:hue-rotate(360deg) blur(140px); }
+  }
+  @keyframes flow1 {
+    0%{transform:translate(-10%,-10%) scale(1);}
+    50%{transform:translate(8%,6%) scale(1.05);}
+    100%{transform:translate(-6%,10%) scale(1.1);}
+  }
+  @keyframes flow2 {
+    0%{transform:translate(10%,5%) rotate(10deg) scale(1.05);}
+    100%{transform:translate(-8%,-5%) rotate(-10deg) scale(1.1);}
+  }
+  @keyframes flow3 {
+    0%{transform:translate(-5%,10%) rotate(-15deg) scale(1);}
+    100%{transform:translate(5%,-10%) rotate(15deg) scale(1.08);}
   }
 
-  @keyframes hueSpin {
-    from { filter: hue-rotate(0deg) blur(140px) saturate(150%); }
-    to { filter: hue-rotate(360deg) blur(140px) saturate(150%); }
-  }
-
-  /* Logo background */
+  /* === LOGO BACKGROUND === */
   .logo-bg {
     position: fixed;
     inset: 0;
-    background: url('https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png') center/contain no-repeat;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/2/2e/LOGO_GKE.png')
+      center/contain no-repeat;
     mix-blend-mode: soft-light;
     opacity: 0.15;
     z-index: -1;
   }
 
+  /* === HEADER === */
   header{text-align:center;margin-top:2rem;}
   header img{width:85px;border-radius:50%;box-shadow:0 0 10px #ffffff33;}
   h1{margin:.6rem 0 0;font-size:1.7rem;font-weight:600;}
   header p{margin:.2rem 0 1.5rem;color:#e2ffff;}
 
+  /* === FORM === */
   form{
     background:rgba(255,255,255,0.12);
     backdrop-filter:blur(12px);
@@ -75,14 +101,15 @@
   legend{font-weight:600;margin-bottom:.5rem;}
   .grid{display:grid;gap:.7rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));}
   .actions{display:flex;justify-content:center;gap:1rem;margin-top:1.5rem;}
+
   button{
     border:none;padding:.9rem 1.6rem;border-radius:12px;
     cursor:pointer;font-weight:600;color:#fff;
-    background:linear-gradient(90deg,#ff007f,#7f00ff,#00ffff);
-    background-size:300% 300%;
-    animation:btnFlow 8s linear infinite;
+    background:linear-gradient(270deg,#ff0000,#ff8000,#ffff00,#00ff00,#00ffff,#0000ff,#8a2be2,#ff00ff,#ff0000);
+    background-size:600% 600%;
+    animation:btnAurora 10s linear infinite;
   }
-  @keyframes btnFlow {
+  @keyframes btnAurora {
     0%{background-position:0% 50%;}
     50%{background-position:100% 50%;}
     100%{background-position:0% 50%;}
@@ -90,8 +117,8 @@
   button:hover{transform:scale(1.05);}
   footer{text-align:center;margin-top:auto;padding:1rem;color:#f0faff;opacity:.9;}
 </style>
-
 </head>
+
 <body>
 <div class="aurora"></div>
 <div class="logo-bg"></div>
