@@ -165,65 +165,51 @@
 </form>
 
 <section style="width:90%;max-width:900px;background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.25);padding:1.5rem;margin-bottom:2rem;">
-  <h2 style="text-align:center;margin-bottom:1rem;">📊 Rekap Usulan yang Masuk</h2>
+  <h2 style="text-align:center;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:.4rem;">
+    📊 <span>Rekap Usulan yang Masuk</span>
+  </h2>
   <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;color:#fff;">
+    <table style="width:100%;border-collapse:collapse;color:#fff;font-size:0.95rem;">
       <thead>
-        <tr style="background:rgba(255,255,255,0.2);">
-          <th style="padding:8px 4px;">ID</th>
-          <th style="padding:8px 4px;">Tanggal</th>
-          <th style="padding:8px 4px;">Kelompok Pekerja</th>
-          <th style="padding:8px 4px;">Nama Pengisi</th>
-          <th style="padding:8px 4px;">Jumlah Usulan</th>
+        <tr style="background:rgba(255,255,255,0.25);box-shadow:inset 0 -2px 0 rgba(255,255,255,0.3);">
+          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:left;">ID</th>
+          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:left;">Tanggal</th>
+          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:left;">Kelompok Pekerja</th>
+          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:left;">Nama Pengisi</th>
+          <th style="padding:10px 6px;border-bottom:2px solid rgba(255,255,255,0.2);text-align:center;">Jumlah Usulan</th>
         </tr>
       </thead>
-      <tbody id="rekapBody"></tbody>
+      <tbody id="rekapBody"
+        style="transition:opacity .4s ease;border-radius:12px;overflow:hidden;"></tbody>
     </table>
   </div>
-  <p id="statusMsg" style="text-align:center;margin-top:1rem;font-size:.85rem;opacity:.8;">
-    *Data diperbarui otomatis dari Google Sheet "usulan"
+  <p id="statusMsg" style="text-align:center;margin-top:1rem;font-size:.85rem;opacity:.9;">
+    ✅ Data berhasil dimuat dari Google Sheet.
   </p>
 </section>
 
-<footer>&copy; <span id="year"></span> MPHJ GKE Yerusalem Tamiang Layang</footer>
-
 <script>
-// === Generate 10 kolom usulan ===
-const grid = document.getElementById('gridUsulan');
-for (let i = 1; i <= 10; i++) {
-  const lbl = document.createElement('label');
-  lbl.innerHTML = `Usulan ${i}<input type='text' name='usulan${i}' />`;
-  grid.appendChild(lbl);
-}
-document.getElementById('year').textContent = new Date().getFullYear();
-
-// === Kirim data ke Apps Script ===
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
-document.getElementById('usulanForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(e.target).entries());
-  try {
-    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-    alert('✅ Usulan berhasil dikirim. Terima kasih!');
-    e.target.reset();
-  } catch (err) {
-    alert('❌ Gagal mengirim, periksa koneksi.');
-    console.error(err);
-  }
-});
-
-// === Load data dari Sheet CSV ===
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHCQ_5BGfWSTnGY3Si0DOMP9MIrmhtJT7I8N0pvuR3T8IZ_sL9kCwiV0qAbJZRf2EGiIr33W9QVMsT/pub?gid=0&single=true&output=csv";
 const tableBody = document.getElementById("rekapBody");
 const statusMsg = document.getElementById("statusMsg");
+
+// Fungsi ubah format tanggal ke Bahasa Indonesia
+function formatTanggal(tgl) {
+  if (!tgl || !/^\d{4}-\d{2}-\d{2}$/.test(tgl)) return tgl;
+  const [y, m, d] = tgl.split("-");
+  const bulan = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+  return `${d} ${bulan[parseInt(m)-1]} ${y}`;
+}
 
 async function loadData() {
   try {
     tableBody.innerHTML = "";
     statusMsg.textContent = "⏳ Memuat data...";
     const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now());
-    const text = (await res.text()).replace(/^\uFEFF/, ""); // hapus BOM
-
+    const text = (await res.text()).replace(/^\uFEFF/, "");
     const rows = text.trim().split(/\r?\n/).map(r => r.split(","));
     if (rows.length <= 1) {
       statusMsg.textContent = "⚠️ Tidak ada data ditemukan.";
@@ -233,28 +219,33 @@ async function loadData() {
     rows.slice(1).forEach((cols, i) => {
       if (cols.length < 14) return;
       const id = cols[0] || i + 1;
-      const tanggal = cols[1] || "-";
+      const tanggal = formatTanggal(cols[1] || "-");
       const kelompok = cols[2] || "-";
       const nama = cols[3] || "-";
       const usulans = cols.slice(4, 14);
       const jumlah = usulans.filter(x => x && x.trim() !== "").length;
 
       const tr = document.createElement("tr");
+      tr.style.background = i % 2 === 0
+        ? "rgba(255,255,255,0.06)"
+        : "rgba(255,255,255,0.12)";
+      tr.style.borderBottom = "1px solid rgba(255,255,255,0.15)";
       tr.innerHTML = `
-        <td>${id}</td>
-        <td>${tanggal}</td>
-        <td>${kelompok}</td>
-        <td>${nama}</td>
-        <td style="text-align:center">${jumlah}</td>`;
+        <td style="padding:8px 6px;">${id}</td>
+        <td style="padding:8px 6px;">${tanggal}</td>
+        <td style="padding:8px 6px;">${kelompok}</td>
+        <td style="padding:8px 6px;">${nama}</td>
+        <td style="padding:8px 6px;text-align:center;">${jumlah}</td>`;
       tableBody.appendChild(tr);
     });
 
-    statusMsg.textContent = "✅ Data berhasil dimuat dari Google Sheet.";
+    statusMsg.innerHTML = "✅ <b>Data berhasil dimuat dari Google Sheet.</b>";
   } catch (err) {
     console.error(err);
     statusMsg.textContent = "⚠️ Gagal memuat data, periksa koneksi atau izin Sheet.";
   }
 }
+
 loadData();
 </script>
 </body>
