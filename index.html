@@ -199,32 +199,6 @@
 <footer>&copy; <span id="year"></span> MPHJ GKE Yerusalem Tamiang Layang</footer>
 
 <script>
-  // generate 10 input usulan otomatis
-  const grid = document.getElementById('gridUsulan');
-  for(let i=1;i<=10;i++){
-    const lbl=document.createElement('label');
-    lbl.innerHTML=`Usulan ${i}<input type='text' name='usulan${i}' />`;
-    grid.appendChild(lbl);
-  }
-  document.getElementById('year').textContent=new Date().getFullYear();
-
-  // URL Apps Script kamu
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
-
-  document.getElementById('usulanForm').addEventListener('submit', async e=>{
-    e.preventDefault();
-    const data=Object.fromEntries(new FormData(e.target).entries());
-    try{
-      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(data)});
-      alert('✅ Usulan berhasil dikirim. Terima kasih!');
-      e.target.reset();
-    }catch(err){
-      alert('❌ Gagal mengirim, periksa koneksi.');
-      console.error(err);
-    }
-  });
-</script>
- <script>
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHCQ_5BGfWSTnGY3Si0DOMP9MIrmhtJT7I8N0pvuR3T8IZ_sL9kCwiV0qAbJZRf2EGiIr33W9QVMsT/pub?gid=0&single=true&output=csv";
 const tableBody = document.getElementById("rekapBody");
 const statusMsg = document.getElementById("statusMsg");
@@ -235,39 +209,69 @@ async function loadData(){
     statusMsg.textContent = "⏳ Memuat data...";
     const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now());
     const text = await res.text();
-    const rows = text.trim().split("\n").map(r => r.split(","));
 
-    // abaikan header
-    rows.slice(1).forEach(cols => {
-      if(cols.length >= 14){
-        const id = cols[0];
-        const tanggal = cols[1];
-        const kelompok = cols[2];
-        const nama = cols[3];
-        const usulans = cols.slice(4,14);
-        const jumlah = usulans.filter(x => x && x.trim() !== "").length;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${id}</td>
-          <td>${tanggal}</td>
-          <td>${kelompok}</td>
-          <td>${nama}</td>
-          <td style="text-align:center">${jumlah}</td>
-        `;
-        tableBody.appendChild(tr);
+    // ✅ parsing CSV yang aman (support koma di dalam tanda kutip)
+    const rows = [];
+    let current = [];
+    let insideQuotes = false;
+    let cell = "";
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char === '"') {
+        insideQuotes = !insideQuotes;
+      } else if (char === "," && !insideQuotes) {
+        current.push(cell.trim());
+        cell = "";
+      } else if (char === "\n" && !insideQuotes) {
+        current.push(cell.trim());
+        rows.push(current);
+        current = [];
+        cell = "";
+      } else {
+        cell += char;
       }
+    }
+    if (cell) current.push(cell.trim());
+    if (current.length) rows.push(current);
+
+    if (rows.length <= 1) {
+      statusMsg.textContent = "⚠️ Tidak ada data ditemukan.";
+      return;
+    }
+
+    // ambil baris mulai dari index 1 (skip header)
+    rows.slice(1).forEach((cols, i) => {
+      // pastikan minimal 14 kolom
+      if (cols.length < 14) return;
+
+      const id = cols[0] || i + 1;
+      const tanggal = cols[1] || "-";
+      const kelompok = cols[2] || "-";
+      const nama = cols[3] || "-";
+      const usulans = cols.slice(4, 14);
+      const jumlah = usulans.filter(x => x && x.trim() !== "").length;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${id}</td>
+        <td>${tanggal}</td>
+        <td>${kelompok}</td>
+        <td>${nama}</td>
+        <td style="text-align:center">${jumlah}</td>
+      `;
+      tableBody.appendChild(tr);
     });
 
-    statusMsg.textContent = "✅ Data berhasil dimuat";
-  } catch(err){
-    console.error(err);
-    statusMsg.textContent = "⚠️ Gagal memuat data";
+    statusMsg.textContent = "✅ Data berhasil dimuat dari Google Sheet.";
+  } catch (err) {
+    console.error("Gagal memuat:", err);
+    statusMsg.textContent = "⚠️ Gagal memuat data, periksa koneksi atau izin Sheet.";
   }
 }
 
 loadData();
 </script>
+
 
 
 </body>
