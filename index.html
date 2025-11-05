@@ -160,3 +160,65 @@
         <option>Tim Musik</option>
         <option>Tim Multimedia</option>
         <option>Koster Gereja Efata</option>
+        <option>Koster Gereja Maranatha</option>
+        <option>Panitia Pembangunan dan Pemeliharaan Gereja Efata</option>
+        <option>Panitia Pembangunan dan Pemeliharaan Gereja Maranatha</option>
+        <option>Panitia Pengadaan dan Pemeliharaan Tanah Pemakaman</option>
+      </select>
+    </label>
+
+    <label>Nama Pengisi
+      <input type="text" name="nama" placeholder="Nama lengkap" required>
+    </label>
+
+    <fieldset>
+      <legend>Usulan / Pendapat / Masukan</legend>
+      <div class="grid" id="gridUsulan"></div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit">Kirim Usulan</button>
+      <button type="reset" class="secondary">Reset</button>
+    </div>
+  </form>
+
+  <footer>
+    &copy; <span id="year"></span> Gereja Kalimantan Evangelis
+  </footer>
+
+<script>
+  // Buat 10 input usulan
+  const grid = document.getElementById('gridUsulan');
+  for(let i=1;i<=10;i++){
+    const wrap = document.createElement('label');
+    wrap.innerHTML = `Usulan ${i}<input type="text" name="usulan${i}" />`;
+    grid.appendChild(wrap);
+  }
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // URL Apps Script (punya bro) -> doPost
+  const SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
+
+  // Kirim data ke Apps Script
+  const form = document.getElementById('usulanForm');
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    try{
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',            // sesuai endpoint Apps Script publik
+        body: JSON.stringify(data)  // backend membaca JSON ini
+      });
+      alert('✅ Usulan berhasil dikirim. Terima kasih!');
+      form.reset();
+    }catch(err){
+      console.error(err);
+      alert('❌ Gagal mengirim. Coba lagi.');
+    }
+  });
+</script>
+</body>
+</html>
