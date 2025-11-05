@@ -175,8 +175,28 @@
     <button type="reset" class="secondary">Reset</button>
   </div>
 </form>
+<section style="width:90%;max-width:900px;background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.25);padding:1.5rem;margin-bottom:2rem;">
+  <h2 style="text-align:center;margin-bottom:1rem;">📊 Rekap Usulan yang Masuk</h2>
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;color:#fff;">
+      <thead>
+        <tr style="background:rgba(255,255,255,0.2);">
+          <th style="padding:8px 4px;">ID</th>
+          <th style="padding:8px 4px;">Tanggal</th>
+          <th style="padding:8px 4px;">Kelompok Pekerja</th>
+          <th style="padding:8px 4px;">Nama Pengisi</th>
+          <th style="padding:8px 4px;">Jumlah Usulan</th>
+        </tr>
+      </thead>
+      <tbody id="rekapBody"></tbody>
+    </table>
+  </div>
+  <p style="text-align:center;margin-top:1rem;font-size:.85rem;opacity:.8;">
+    *Data diperbarui otomatis dari Google Sheet "usulan"
+  </p>
+</section>
 
-<footer>&copy; <span id="year"></span> Gereja Kalimantan Evangelis</footer>
+<footer>&copy; <span id="year"></span> MPHJ GKE Yerusalem Tamiang Layang</footer>
 
 <script>
   // generate 10 input usulan otomatis
@@ -204,5 +224,46 @@
     }
   });
 </script>
+  <script>
+  // === REKAP DARI GOOGLE SHEET ===
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHCQ_5BGfWSTnGY3Si0DOMP9MIrmhtJT7I8N0pvuR3T8IZ_sL9kCwiV0qAbJZRf2EGiIr33W9QVMsT/gviz/tq?tqx=out:json&sheet=usulan";
+
+  async function loadData(){
+    try {
+      const res = await fetch(SHEET_URL);
+      const text = await res.text();
+      const json = JSON.parse(text.substr(47).slice(0, -2)); // potong format khas gviz
+      const table = document.getElementById("rekapBody");
+      table.innerHTML = "";
+
+      json.table.rows.forEach(row => {
+        const cells = row.c.map(c => c ? c.v : "");
+        if (cells.length >= 14) {
+          const id = cells[0];
+          const tanggal = cells[1];
+          const kelompok = cells[2];
+          const nama = cells[3];
+          const usulan = cells.slice(4,14);
+          const jml = usulan.filter(x => x && x.trim() !== "").length;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${id}</td>
+            <td>${tanggal}</td>
+            <td>${kelompok}</td>
+            <td>${nama}</td>
+            <td style="text-align:center">${jml}</td>
+          `;
+          table.appendChild(tr);
+        }
+      });
+    } catch(err){
+      console.error(err);
+    }
+  }
+
+  loadData();
+</script>
+
 </body>
 </html>
