@@ -209,84 +209,88 @@
 <footer>&copy; <span id="year"></span> MPHJ GKE Yerusalem Tamiang Layang</footer>
 
 <script>
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHCQ_5BGfWSTnGY3Si0DOMP9MIrmhtJT7I8N0pvuR3T8IZ_sL9kCwiV0qAbJZRf2EGiIr33W9QVMsT/pub?gid=0&single=true&output=csv";
-const tableBody = document.getElementById("rekapBody");
-const statusMsg = document.getElementById("statusMsg");
-document.getElementById('year').textContent = new Date().getFullYear();
+document.addEventListener("DOMContentLoaded", () => {
 
-// Generate 10 kolom usulan otomatis
-const grid = document.getElementById('gridUsulan');
-for (let i = 1; i <= 10; i++) {
-  const lbl = document.createElement('label');
-  lbl.innerHTML = `Usulan ${i}<input type='text' name='usulan${i}' />`;
-  grid.appendChild(lbl);
-}
+  const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHCQ_5BGfWSTnGY3Si0DOMP9MIrmhtJT7I8N0pvuR3T8IZ_sL9kCwiV0qAbJZRf2EGiIr33W9QVMsT/pub?gid=0&single=true&output=csv";
+  const tableBody = document.getElementById("rekapBody");
+  const statusMsg = document.getElementById("statusMsg");
+  document.getElementById('year').textContent = new Date().getFullYear();
 
-// Fungsi ubah format tanggal ke format Indonesia
-function formatTanggal(tgl) {
-  if (!tgl || !/^\d{4}-\d{2}-\d{2}$/.test(tgl)) return tgl;
-  const [y, m, d] = tgl.split("-");
-  const bulan = [
-    "Januari","Februari","Maret","April","Mei","Juni",
-    "Juli","Agustus","September","Oktober","November","Desember"
-  ];
-  return `${d} ${bulan[parseInt(m)-1]} ${y}`;
-}
-
-// Kirim data ke Apps Script
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
-document.getElementById('usulanForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(e.target).entries());
-  try {
-    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-    alert('✅ Usulan berhasil dikirim. Terima kasih!');
-    e.target.reset();
-  } catch (err) {
-    alert('❌ Gagal mengirim, periksa koneksi.');
-    console.error(err);
+  // ✅ Generate 10 kolom usulan otomatis (dijalankan setelah DOM siap)
+  const grid = document.getElementById('gridUsulan');
+  for (let i = 1; i <= 10; i++) {
+    const lbl = document.createElement('label');
+    lbl.innerHTML = `Usulan ${i}<input type='text' name='usulan${i}' placeholder='Masukkan usulan ke-${i}' />`;
+    grid.appendChild(lbl);
   }
-});
 
-// Load data dari Google Sheet
-async function loadData() {
-  try {
-    tableBody.innerHTML = "";
-    statusMsg.textContent = "⏳ Memuat data...";
-    const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now());
-    const text = (await res.text()).replace(/^\uFEFF/, "");
-    const rows = text.trim().split(/\r?\n/).map(r => r.split(","));
-    if (rows.length <= 1) {
-      statusMsg.textContent = "⚠️ Tidak ada data ditemukan.";
-      return;
+  // Fungsi ubah format tanggal ke format Indonesia
+  function formatTanggal(tgl) {
+    if (!tgl || !/^\d{4}-\d{2}-\d{2}$/.test(tgl)) return tgl;
+    const [y, m, d] = tgl.split("-");
+    const bulan = [
+      "Januari","Februari","Maret","April","Mei","Juni",
+      "Juli","Agustus","September","Oktober","November","Desember"
+    ];
+    return `${d} ${bulan[parseInt(m)-1]} ${y}`;
+  }
+
+  // Kirim data ke Apps Script
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZvPS36yi1Mi_CKfm05I5t4jcoNtbm2AJCNoj3Za6jndFz_s8KMVpRQLGMoHeiFE7Z/exec";
+  document.getElementById('usulanForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    try {
+      await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+      alert('✅ Usulan berhasil dikirim. Terima kasih!');
+      e.target.reset();
+    } catch (err) {
+      alert('❌ Gagal mengirim, periksa koneksi.');
+      console.error(err);
     }
+  });
 
-    rows.slice(1).forEach((cols, i) => {
-      if (cols.length < 14) return;
-      const id = cols[0] || i + 1;
-      const tanggal = formatTanggal(cols[1]);
-      const kelompok = cols[2] || "-";
-      const nama = cols[3] || "-";
-      const usulans = cols.slice(4, 14);
-      const jumlah = usulans.filter(x => x && x.trim() !== "").length;
+  // Load data dari Google Sheet
+  async function loadData() {
+    try {
+      tableBody.innerHTML = "";
+      statusMsg.textContent = "⏳ Memuat data...";
+      const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now());
+      const text = (await res.text()).replace(/^\uFEFF/, "");
+      const rows = text.trim().split(/\r?\n/).map(r => r.split(","));
+      if (rows.length <= 1) {
+        statusMsg.textContent = "⚠️ Tidak ada data ditemukan.";
+        return;
+      }
 
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${id}</td>
-        <td>${tanggal}</td>
-        <td>${kelompok}</td>
-        <td>${nama}</td>
-        <td style="text-align:center;">${jumlah}</td>`;
-      tableBody.appendChild(tr);
-    });
+      rows.slice(1).forEach((cols, i) => {
+        if (cols.length < 14) return;
+        const id = cols[0] || i + 1;
+        const tanggal = formatTanggal(cols[1]);
+        const kelompok = cols[2] || "-";
+        const nama = cols[3] || "-";
+        const usulans = cols.slice(4, 14);
+        const jumlah = usulans.filter(x => x && x.trim() !== "").length;
 
-    statusMsg.innerHTML = "✅ <b>Data berhasil dimuat dari Google Sheet.</b>";
-  } catch (err) {
-    console.error(err);
-    statusMsg.textContent = "⚠️ Gagal memuat data, periksa koneksi atau izin Sheet.";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${id}</td>
+          <td>${tanggal}</td>
+          <td>${kelompok}</td>
+          <td>${nama}</td>
+          <td style="text-align:center;">${jumlah}</td>`;
+        tableBody.appendChild(tr);
+      });
+
+      statusMsg.innerHTML = "✅ <b>Data berhasil dimuat dari Google Sheet.</b>";
+    } catch (err) {
+      console.error(err);
+      statusMsg.textContent = "⚠️ Gagal memuat data, periksa koneksi atau izin Sheet.";
+    }
   }
-}
-loadData();
+
+  loadData();
+});
 </script>
 </body>
 </html>
