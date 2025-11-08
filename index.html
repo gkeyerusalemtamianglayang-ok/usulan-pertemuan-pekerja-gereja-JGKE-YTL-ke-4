@@ -288,7 +288,31 @@ document.addEventListener("DOMContentLoaded", () => {
       tableBody.innerHTML = "";
       const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now());
       const text = (await res.text()).replace(/^\uFEFF/, "");
-      const rows = text.trim().split(/\r?\n/).map(r => r.split(","));
+
+// Parser CSV yang aman, mempertahankan tanda kutip & koma di dalam kolom
+function parseCSV(str) {
+  const rows = [];
+  let current = [], cell = "", inQuotes = false;
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const next = str[i + 1];
+
+    if (char === '"' && inQuotes && next === '"') { cell += '"'; i++; continue; }
+    if (char === '"') { inQuotes = !inQuotes; continue; }
+    if (char === ',' && !inQuotes) { current.push(cell); cell = ""; continue; }
+    if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (cell || current.length) { current.push(cell); rows.push(current); }
+      current = []; cell = "";
+      continue;
+    }
+    cell += char;
+  }
+  if (cell || current.length) { current.push(cell); rows.push(current); }
+  return rows;
+}
+
+const rows = parseCSV(text.trim());
+
       if (rows.length <= 1) { statusMsg.textContent = "⚠️ Tidak ada data."; return; }
       existingNames = rows.slice(1).map(r => (r[3] || "").trim().toLowerCase());
 
