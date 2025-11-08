@@ -48,7 +48,6 @@
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
-
   header::after {
     content: "";
     position: absolute;
@@ -64,13 +63,6 @@
   @keyframes pulse {
     from { filter: drop-shadow(0 0 5px rgba(255,255,255,0.4)); }
     to { filter: drop-shadow(0 0 25px rgba(255,255,255,0.9)); }
-  }
-
-  main {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
 
   form, section {
@@ -105,10 +97,7 @@
   legend { font-weight: 600; margin-bottom: .7rem; color: #1e3a8a; }
   .grid { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 
-  .actions {
-    display: flex; justify-content: center; gap: 1rem;
-    margin-top: 1.5rem; flex-wrap: wrap;
-  }
+  .actions { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
   button {
     border: none; padding: .9rem 1.6rem; border-radius: 10px;
     cursor: pointer; font-weight: 600; color: #fff;
@@ -194,7 +183,6 @@
     <input type="text" name="nama" placeholder="Nama lengkap" required>
   </label>
 
-  <!-- ✅ Tambahan Laporan Kegiatan -->
   <label>Laporan Kegiatan (opsional)
     <textarea name="laporan" placeholder="Tuliskan laporan kegiatan atau uraian singkat..."></textarea>
   </label>
@@ -224,6 +212,7 @@
           <th>Kelompok</th>
           <th>Nama Pengisi</th>
           <th>Jumlah Usulan</th>
+          <th>Status Laporan Kegiatan</th>
         </tr>
       </thead>
       <tbody id="rekapBody"></tbody>
@@ -289,31 +278,29 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now());
       const text = (await res.text()).replace(/^\uFEFF/, "");
 
-// Parser CSV yang aman, mempertahankan tanda kutip & koma di dalam kolom
-function parseCSV(str) {
-  const rows = [];
-  let current = [], cell = "", inQuotes = false;
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-    const next = str[i + 1];
+      function parseCSV(str) {
+        const rows = [];
+        let current = [], cell = "", inQuotes = false;
+        for (let i = 0; i < str.length; i++) {
+          const char = str[i];
+          const next = str[i + 1];
+          if (char === '"' && inQuotes && next === '"') { cell += '"'; i++; continue; }
+          if (char === '"') { inQuotes = !inQuotes; continue; }
+          if (char === ',' && !inQuotes) { current.push(cell); cell = ""; continue; }
+          if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (cell || current.length) { current.push(cell); rows.push(current); }
+            current = []; cell = "";
+            continue;
+          }
+          cell += char;
+        }
+        if (cell || current.length) { current.push(cell); rows.push(current); }
+        return rows;
+      }
 
-    if (char === '"' && inQuotes && next === '"') { cell += '"'; i++; continue; }
-    if (char === '"') { inQuotes = !inQuotes; continue; }
-    if (char === ',' && !inQuotes) { current.push(cell); cell = ""; continue; }
-    if ((char === '\n' || char === '\r') && !inQuotes) {
-      if (cell || current.length) { current.push(cell); rows.push(current); }
-      current = []; cell = "";
-      continue;
-    }
-    cell += char;
-  }
-  if (cell || current.length) { current.push(cell); rows.push(current); }
-  return rows;
-}
-
-const rows = parseCSV(text.trim());
-
+      const rows = parseCSV(text.trim());
       if (rows.length <= 1) { statusMsg.textContent = "⚠️ Tidak ada data."; return; }
+
       existingNames = rows.slice(1).map(r => (r[3] || "").trim().toLowerCase());
 
       rows.slice(1).forEach((cols, i) => {
@@ -322,10 +309,19 @@ const rows = parseCSV(text.trim());
         const kelompok = cols[2] || "-";
         const nama = cols[3] || "-";
         const jumlah = cols.slice(4, 14).filter(x => x && x.trim() !== "").length;
+        const laporan = cols[14] || "";
+        const statusLaporan = laporan.trim() ? "✅ Ada" : "❌ Tidak Ada";
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${id}</td><td>${tanggal}</td><td>${kelompok}</td><td>${nama}</td><td style="text-align:center;">${jumlah}</td>`;
+        tr.innerHTML = `
+          <td>${id}</td>
+          <td>${tanggal}</td>
+          <td>${kelompok}</td>
+          <td>${nama}</td>
+          <td style="text-align:center;">${jumlah}</td>
+          <td style="text-align:center;">${statusLaporan}</td>`;
         tableBody.appendChild(tr);
       });
+
       statusMsg.textContent = "✅ Data berhasil dimuat.";
     } catch {
       statusMsg.textContent = "⚠️ Gagal memuat data.";
